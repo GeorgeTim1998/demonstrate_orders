@@ -4,19 +4,19 @@ import (
 	"log"
 	"time"
 
-	"github.com/nats-io/nats.go"
+	"github.com/nats-io/stan.go"
 )
 
 func main() {
-	nc, err := nats.Connect("nats://localhost:4223")
+	sc, err := stan.Connect("test-cluster", "publisher-client", stan.NatsURL("nats://localhost:4223"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer nc.Close()
+	defer sc.Close()
 
 	subject := "test.subject"
 	msg := []byte("MyMessage is the best!")
-	err = nc.Publish(subject, msg)
+	err = sc.Publish(subject, msg)
 	if err != nil {
 		log.Fatal(err)
 	}
