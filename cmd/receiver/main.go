@@ -3,20 +3,20 @@ package main
 import (
 	"log"
 
-	"github.com/nats-io/nats.go"
+	"github.com/nats-io/stan.go"
 )
 
 func main() {
-	sc, err := nats.Connect("nats://localhost:4223")
+	sc, err := stan.Connect("test-cluster", "receiver-123", stan.NatsURL("nats://localhost:4223"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sc.Close()
 
-	subscription, err := sc.Subscribe("test.subject", func(msg *nats.Msg) {
+	subscription, err := sc.Subscribe("test.subject", func(msg *stan.Msg) {
 		log.Printf("Received message: %s", string(msg.Data))
 		log.Printf("Message Body Twice: %s %s", string(msg.Data), string(msg.Data))
-	})
+	}, stan.DeliverAllAvailable())
 	if err != nil {
 		log.Fatal(err)
 	}
