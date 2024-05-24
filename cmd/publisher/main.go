@@ -15,7 +15,7 @@ func main() {
 	defer nc.Close()
 
 	subject := "test.subject"
-	msg := []byte("Message")
+	msg := []byte("MyMessage is the best!")
 	err = nc.Publish(subject, msg)
 	if err != nil {
 		log.Fatal(err)
