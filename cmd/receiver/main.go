@@ -16,6 +16,7 @@ func main() {
 	subscription, err := sc.Subscribe("test.subject", func(msg *stan.Msg) {
 		log.Printf("Received message: %s", string(msg.Data))
 		log.Printf("Message Body Twice: %s %s", string(msg.Data), string(msg.Data))
+		msg.Ack()
 	}, stan.DurableName("my-durable"))
 	if err != nil {
 		log.Fatal(err)
