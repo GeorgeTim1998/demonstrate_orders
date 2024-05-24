@@ -12,7 +12,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	defer nc.Close()
 
 	subject := "test.subject"
