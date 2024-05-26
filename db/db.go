@@ -21,8 +21,6 @@ func InitDB(cfg *config.Config) (*sql.DB, error) {
 		return nil, fmt.Errorf("error opening database: %v", err)
 	}
 
-	defer DB.Close()
-
 	if err = DB.Ping(); err != nil {
 		return nil, fmt.Errorf("error connecting to the database: %v", err)
 	}
