@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS "order" (
+CREATE TABLE IF NOT EXISTS "orders" (
     "order_uid" VARCHAR(255) PRIMARY KEY,
     "track_number" VARCHAR(255),
     "entry" VARCHAR(255),
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "order" (
 );
 
 -- Миграция для создания таблицы "Delivery"
-CREATE TABLE IF NOT EXISTS "delivery" (
+CREATE TABLE IF NOT EXISTS "deliveries" (
     "order_uid" VARCHAR(255) PRIMARY KEY,
     "name" VARCHAR(255),
     "phone" VARCHAR(255),
@@ -26,8 +26,8 @@ CREATE TABLE IF NOT EXISTS "delivery" (
     "email" VARCHAR(255)
 );
 
--- Миграция для создания таблицы "payment"
-CREATE TABLE IF NOT EXISTS "payment" (
+-- Миграция для создания таблицы "payments"
+CREATE TABLE IF NOT EXISTS "payments" (
     "order_uid" VARCHAR(255) PRIMARY KEY,
     "transaction" VARCHAR(255),
     "request_id" VARCHAR(255),
@@ -41,8 +41,8 @@ CREATE TABLE IF NOT EXISTS "payment" (
     "custom_fee" INTEGER
 );
 
--- Миграция для создания таблицы "item"
-CREATE TABLE IF NOT EXISTS "item" (
+-- Миграция для создания таблицы "items"
+CREATE TABLE IF NOT EXISTS "items" (
     "chrt_id" INTEGER PRIMARY KEY,
     "order_uid" VARCHAR(255),
     "track_number" VARCHAR(255),
@@ -58,23 +58,23 @@ CREATE TABLE IF NOT EXISTS "item" (
 );
 
 -- Создание внешних ключей
-ALTER TABLE "delivery" ADD FOREIGN KEY ("order_uid") REFERENCES "order" ("order_uid");
-ALTER TABLE "payment" ADD FOREIGN KEY ("order_uid") REFERENCES "order" ("order_uid");
-ALTER TABLE "item" ADD FOREIGN KEY ("order_uid") REFERENCES "order" ("order_uid");
+ALTER TABLE "deliveries" ADD FOREIGN KEY ("order_uid") REFERENCES "orders" ("order_uid");
+ALTER TABLE "payments" ADD FOREIGN KEY ("order_uid") REFERENCES "orders" ("order_uid");
+ALTER TABLE "items" ADD FOREIGN KEY ("order_uid") REFERENCES "orders" ("order_uid");
 
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
 -- Удаление внешних ключей
-ALTER TABLE "item" DROP CONSTRAINT "item_order_uid_fkey";
-ALTER TABLE "payment" DROP CONSTRAINT "payment_order_uid_fkey";
-ALTER TABLE "delivery" DROP CONSTRAINT "delivery_order_uid_fkey";
+ALTER TABLE "items" DROP CONSTRAINT "item_order_uid_fkey";
+ALTER TABLE "payments" DROP CONSTRAINT "payment_order_uid_fkey";
+ALTER TABLE "deliveries" DROP CONSTRAINT "delivery_order_uid_fkey";
 
 -- Удаление таблиц
-DROP TABLE IF EXISTS "item";
-DROP TABLE IF EXISTS "payment";
-DROP TABLE IF EXISTS "delivery";
-DROP TABLE IF EXISTS "order";
+DROP TABLE IF EXISTS "items";
+DROP TABLE IF EXISTS "payments";
+DROP TABLE IF EXISTS "deliveries";
+DROP TABLE IF EXISTS "orders";
 ;
 -- +goose StatementEnd
