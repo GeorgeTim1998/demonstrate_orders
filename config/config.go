@@ -35,9 +35,9 @@ func LoadConfig() (*Config, error) {
 	config := &Config{
 		DBHost:     dbHost,
 		DBPort:     dbPort,
-		DBUser:     dbName,
+		DBUser:     dbUser,
 		DBPassword: dbPassword,
-		DBName:     dbUser,
+		DBName:     dbName,
 	}
 
 	return config, nil
