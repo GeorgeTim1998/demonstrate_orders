@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -27,11 +27,12 @@ func getOrderHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(order)
 }
 
-func main() {
+func Run() error {
 	r := mux.NewRouter()
 	r.HandleFunc("/order/{orderUID}", getOrderHandler).Methods("GET")
 
 	http.Handle("/", r)
 	log.Println("Server is running on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+
+	return http.ListenAndServe(":8080", nil)
 }

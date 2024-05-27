@@ -1,4 +1,4 @@
-package main
+package receiver
 
 import (
 	"demonstrate_orders/config"
@@ -12,10 +12,11 @@ import (
 	"github.com/nats-io/stan.go"
 )
 
-func main() {
+func Run() error {
 	sc, err := stan.Connect("test-cluster", "receiver-123", stan.NatsURL("nats://localhost:4223"))
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 	defer sc.Close()
 
@@ -43,6 +44,7 @@ func main() {
 	}, stan.DurableName("my-durable"), stan.SetManualAckMode())
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 	defer subscription.Close()
 
