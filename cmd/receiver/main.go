@@ -3,18 +3,13 @@ package main
 import (
 	"demonstrate_orders/config"
 	DB "demonstrate_orders/db"
+	"demonstrate_orders/global"
 	"encoding/json"
 	"log"
-	"sync"
 
 	"demonstrate_orders/db/models"
 
 	"github.com/nats-io/stan.go"
-)
-
-var (
-	cache = make(map[string]models.Order)
-	mu    sync.Mutex
 )
 
 func main() {
@@ -32,9 +27,9 @@ func main() {
 			return
 		}
 
-		mu.Lock()
-		cache[order.OrderUID] = order
-		mu.Unlock()
+		global.Mu.Lock()
+		global.Cache[order.OrderUID] = order
+		global.Mu.Unlock()
 
 		log.Printf("Received message: %s", order.OrderUID)
 
