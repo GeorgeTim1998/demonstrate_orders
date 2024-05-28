@@ -9,6 +9,8 @@ import (
 
 	"demonstrate_orders/db/models"
 
+	"github.com/google/uuid"
+
 	"github.com/nats-io/stan.go"
 )
 
@@ -25,6 +27,24 @@ func Run() error {
 		err := json.Unmarshal(msg.Data, &order)
 		if err != nil {
 			log.Printf("Error parsing message: %v", err)
+			return
+		}
+
+		if order.OrderUID == "" || order.TrackNumber == "" || order.CustomerID == "" || order.Delivery.Name == "" {
+			log.Printf("Error: Order is missing required fields")
+			msg.Ack()
+			return
+		}
+
+		if _, err := uuid.Parse(order.OrderUID); err != nil {
+			log.Printf("Error: OrderUID is not in valid UUID format")
+			msg.Ack()
+			return
+		}
+
+		if _, err := uuid.Parse(order.Payment.Transaction); err != nil {
+			log.Printf("Error: OrderUID is not in valid UUID format")
+			msg.Ack()
 			return
 		}
 
