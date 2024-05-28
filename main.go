@@ -5,9 +5,15 @@ import (
 	"demonstrate_orders/cmd/server"
 	"demonstrate_orders/global"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
 	err := global.LoadCacheFromDB()
 	if err != nil {
 		log.Fatalf("Error loading cache from database: %v", err)
@@ -25,5 +31,6 @@ func main() {
 		}
 	}()
 
-	select {}
+	<-interrupt
+	log.Println("Received interrupt signal for the application. Shutting down...")
 }

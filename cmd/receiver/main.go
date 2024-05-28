@@ -7,6 +7,10 @@ import (
 	"encoding/json"
 	"log"
 
+	"os"
+	"os/signal"
+	"syscall"
+
 	"demonstrate_orders/db/models"
 
 	"github.com/google/uuid"
@@ -15,6 +19,9 @@ import (
 )
 
 func Run() error {
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
 	sc, err := stan.Connect("test-cluster", "receiver-123", stan.NatsURL("nats://localhost:4223"))
 	if err != nil {
 		log.Fatal(err)
@@ -68,7 +75,13 @@ func Run() error {
 	}
 	defer subscription.Close()
 
-	select {}
+	<-interrupt
+
+	log.Println("Received interrupt signal. Closing subscription and shutting down...")
+	subscription.Close()
+	log.Println("Subscription closed. Exiting...")
+
+	return nil
 }
 
 func saveOrderToDB(order models.Order) error {
