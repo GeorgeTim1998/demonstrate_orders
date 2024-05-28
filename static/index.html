@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Lookup</title>
+</head>
+<body>
+    <h1>Order Lookup</h1>
+    <form id="orderForm">
+        <label for="orderUID">Order UID:</label>
+        <input type="text" id="orderUID" name="orderUID" required>
+        <button type="submit">Lookup Order</button>
+    </form>
+    <div id="orderResult"></div>
+
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var orderUID = document.getElementById('orderUID').value;
+            fetch('/order/' + orderUID)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Order not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var resultDiv = document.getElementById('orderResult');
+                    resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                })
+                .catch(error => {
+                    var resultDiv = document.getElementById('orderResult');
+                    resultDiv.innerHTML = '<p>' + error.message + '</p>';
+                });
+        });
+    </script>
+</body>
+</html>

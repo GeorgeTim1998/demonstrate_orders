@@ -29,6 +29,11 @@ func getOrderHandler(w http.ResponseWriter, r *http.Request) {
 
 func Run() error {
 	r := mux.NewRouter()
+
+	staticDir := http.Dir("./static/")
+	staticFileHandler := http.StripPrefix("/", http.FileServer(staticDir))
+	r.PathPrefix("/").Handler(staticFileHandler)
+
 	r.HandleFunc("/order/{orderUID}", getOrderHandler).Methods("GET")
 
 	http.Handle("/", r)
