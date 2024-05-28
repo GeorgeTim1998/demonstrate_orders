@@ -27,14 +27,15 @@ func getOrderHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(order)
 }
 
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "static/index.html")
+}
+
 func Run() error {
 	r := mux.NewRouter()
 
-	staticDir := http.Dir("./static/")
-	staticFileHandler := http.StripPrefix("/", http.FileServer(staticDir))
-	r.PathPrefix("/").Handler(staticFileHandler)
-
 	r.HandleFunc("/order/{orderUID}", getOrderHandler).Methods("GET")
+	r.HandleFunc("/", indexHandler).Methods("GET")
 
 	http.Handle("/", r)
 	log.Println("Server is running on port 8080")
