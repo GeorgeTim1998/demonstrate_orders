@@ -12,7 +12,7 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d demonstrate_orders_test"]
+      test: ["CMD", "pg_isready -U postgres -d demonstrate_orders_test"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,9 +35,14 @@ services:
       - NATS_CLUSTER_ID=test-cluster
       - NATS_CLIENT_ID=receiver-123
       - NATS_URL=nats://nats-streaming:4223
+      - WAIT_HOSTS=db:5432
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
       - DATABASE_URL=postgres://postgres:password@db:5432/demonstrate_orders_test?sslmode=disable
     depends_on:
       - db
       - nats-streaming
+    command: sh -c "/wait && ./bin/goose -dir db/migrations postgres $DATABASE_URL up"
     ports:
       - "8080:8080"
