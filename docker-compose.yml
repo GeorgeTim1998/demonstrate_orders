@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: demonstrate_orders_test
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d demonstrate_orders_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nats-streaming:
+    image: nats-streaming:0.22.0
+    ports:
+      - "4223:4223"
+      - "8222:8222"
+    command: ["-p", "4223", "-m", "8222"]
+
+  app:
+    build: .
+    environment:
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=demonstrate_orders_test
+      - DB_HOST=db
+      - DB_PORT=5434
+      - NATS_CLUSTER_ID=test-cluster
+      - NATS_CLIENT_ID=receiver-123
+      - NATS_URL=nats://nats-streaming:4223
+      - DATABASE_URL=postgres://user:password@db:5432/demonstrate_orders_test?sslmode=disable
+    depends_on:
+      - db
+      - nats-streaming
+    ports:
+      - "8080:8080"
