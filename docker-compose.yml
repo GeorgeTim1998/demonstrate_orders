@@ -27,7 +27,7 @@ services:
   app:
     build: .
     environment:
-      - DB_USER=user
+      - DB_USER=postgres
       - DB_PASSWORD=password
       - DB_NAME=demonstrate_orders_test
       - DB_HOST=db
@@ -35,7 +35,7 @@ services:
       - NATS_CLUSTER_ID=test-cluster
       - NATS_CLIENT_ID=receiver-123
       - NATS_URL=nats://nats-streaming:4223
-      - DATABASE_URL=postgres://user:password@db:5432/demonstrate_orders_test?sslmode=disable
+      - DATABASE_URL=postgres://postgres:password@db:5432/demonstrate_orders_test?sslmode=disable
     depends_on:
       - db
       - nats-streaming
