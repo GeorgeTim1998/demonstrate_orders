@@ -47,7 +47,6 @@ func TestOrderFlow(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	url := fmt.Sprintf("http://app:8080/order/%s", order.OrderUID)
-
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalf("Failed to make GET request: %v", err)
@@ -62,6 +61,19 @@ func TestOrderFlow(t *testing.T) {
 	err = json.NewDecoder(resp.Body).Decode(&gotOrder)
 	assert.NoError(t, err)
 	assert.Equal(t, order.OrderUID, gotOrder.OrderUID)
+}
+
+func TestNoOrder(t *testing.T) {
+	url := fmt.Sprintf("http://app:8080/order/%s", "12345")
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatalf("Failed to make GET request: %v", err)
+	}
+	defer resp.Body.Close()
+	assert.NoError(t, err)
+
+	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+	log.Println("Response status: ", resp.StatusCode)
 }
 
 func generateRandomOrder() models.Order {
