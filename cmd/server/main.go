@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func getOrderHandler(w http.ResponseWriter, r *http.Request) {
+func GetOrderHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	orderUID := vars["orderUID"]
 
@@ -34,7 +34,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func Run() error {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/order/{orderUID}", getOrderHandler).Methods("GET")
+	r.HandleFunc("/order/{orderUID}", GetOrderHandler).Methods("GET")
 	r.HandleFunc("/", indexHandler).Methods("GET")
 
 	http.Handle("/", r)
