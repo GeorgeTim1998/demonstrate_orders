@@ -30,7 +30,7 @@ func Run() error {
 
 	sc, err := stan.Connect("test-cluster", "receiver-123", stan.NatsURL(os.Getenv("NATS_HOST")))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Receiver experienced an error connecting to nats: %v", err)
 		return err
 	}
 	defer sc.Close()
@@ -76,7 +76,7 @@ func Run() error {
 		}
 	}, stan.DurableName("my-durable"), stan.SetManualAckMode())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error in subscription: %v", err)
 		return err
 	}
 	defer subscription.Close()
