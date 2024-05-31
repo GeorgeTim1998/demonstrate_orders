@@ -90,8 +90,8 @@ func TestOrderDBPresence(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	query := `SELECT order_uid FROM orders`
-	rows, _ := db.Query(query)
+	query := `SELECT order_uid FROM orders WHERE order_uid = $1`
+	rows, _ := db.Query(query, order.OrderUID)
 	defer rows.Close()
 
 	var db_order models.Order
