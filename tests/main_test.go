@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,6 +10,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	_ "github.com/lib/pq"
 
 	"demonstrate_orders/db/models"
 
@@ -61,6 +64,43 @@ func TestOrderFlow(t *testing.T) {
 	err = json.NewDecoder(resp.Body).Decode(&gotOrder)
 	assert.NoError(t, err)
 	assert.Equal(t, order.OrderUID, gotOrder.OrderUID)
+}
+
+func TestOrderDBPresence(t *testing.T) {
+	subject := "test.subject"
+	order := generateRandomOrder()
+	msg, err := json.Marshal(order)
+	assert.NoError(t, err)
+	err = sc.Publish(subject, msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Published message:", string(msg))
+	assert.NoError(t, err)
+
+	time.Sleep(2 * time.Second)
+
+	// database test
+	var db *sql.DB
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
+	db, err = sql.Open("postgres", connStr)
+	assert.NoError(t, err)
+	err = db.Ping()
+	assert.NoError(t, err)
+	defer db.Close()
+
+	query := `SELECT order_uid FROM orders`
+	rows, _ := db.Query(query)
+	defer rows.Close()
+
+	var db_order models.Order
+	for rows.Next() {
+		err = rows.Scan(&db_order.OrderUID)
+		assert.NoError(t, err)
+	}
+
+	assert.Equal(t, order.OrderUID, db_order.OrderUID)
 }
 
 func TestNoOrder(t *testing.T) {
