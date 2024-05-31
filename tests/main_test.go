@@ -71,6 +71,65 @@ func TestOrderFlow(t *testing.T) {
 	assert.Equal(t, order.OrderUID, gotOrder.OrderUID)
 }
 
+func TestInvalidOrderFlow(t *testing.T) {
+	setupDB(t)
+	defer db.Close()
+	defer clearDB(t)
+
+	subject := "test.subject"
+	order := generateRandomOrder()
+	order.OrderUID = "12345"
+	msg, err := json.Marshal(order)
+	assert.NoError(t, err)
+	err = sc.Publish(subject, msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Published message:", string(msg))
+	assert.NoError(t, err)
+
+	time.Sleep(2 * time.Second)
+
+	url := fmt.Sprintf("http://app:8080/order/%s", order.OrderUID)
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatalf("Failed to make GET request: %v", err)
+	}
+	defer resp.Body.Close()
+	assert.NoError(t, err)
+
+	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+	log.Println("Response status: ", resp.StatusCode)
+}
+
+func TestInvalidOrderDBAbscence(t *testing.T) {
+	setupDB(t)
+	defer db.Close()
+	defer clearDB(t)
+
+	subject := "test.subject"
+	order := generateRandomOrder()
+	order.OrderUID = "12345"
+	msg, err := json.Marshal(order)
+	assert.NoError(t, err)
+	err = sc.Publish(subject, msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Published message:", string(msg))
+	assert.NoError(t, err)
+
+	time.Sleep(2 * time.Second)
+
+	// database test
+	query := `SELECT order_uid FROM orders WHERE order_uid = $1`
+	rows, _ := db.Query(query, order.OrderUID)
+	defer rows.Close()
+
+	assert.Equal(t, rows.Next(), false)
+	assert.NoError(t, rows.Err())
+}
+
 func TestOrderDBPresence(t *testing.T) {
 	setupDB(t)
 	defer db.Close()
