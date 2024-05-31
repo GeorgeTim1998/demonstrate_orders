@@ -28,9 +28,9 @@ func Run() error {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
-	sc, err := stan.Connect("test-cluster", "receiver-123", stan.NatsURL(os.Getenv("NATS_HOST")))
+	sc, err := stan.Connect("test-cluster", "receiver-123", stan.NatsURL(os.Getenv("NATS_URL")))
 	if err != nil {
-		log.Fatalf("Receiver experienced an error connecting to nats: %v", err)
+		log.Fatalf("Receiver experienced an error connecting to nats: %v, %v", err, os.Getenv("NATS_URL"))
 		return err
 	}
 	defer sc.Close()
