@@ -22,6 +22,7 @@ import (
 )
 
 var sc stan.Conn
+var db *sql.DB
 
 func TestMain(m *testing.M) {
 	var err error
@@ -36,6 +37,10 @@ func TestMain(m *testing.M) {
 }
 
 func TestOrderFlow(t *testing.T) {
+	setupDB(t)
+	defer db.Close()
+	defer clearDB(t)
+
 	subject := "test.subject"
 	order := generateRandomOrder()
 	msg, err := json.Marshal(order)
@@ -67,6 +72,10 @@ func TestOrderFlow(t *testing.T) {
 }
 
 func TestOrderDBPresence(t *testing.T) {
+	setupDB(t)
+	defer db.Close()
+	defer clearDB(t)
+
 	subject := "test.subject"
 	order := generateRandomOrder()
 	msg, err := json.Marshal(order)
@@ -81,15 +90,6 @@ func TestOrderDBPresence(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// database test
-	var db *sql.DB
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
-	db, err = sql.Open("postgres", connStr)
-	assert.NoError(t, err)
-	err = db.Ping()
-	assert.NoError(t, err)
-	defer db.Close()
-
 	query := `SELECT order_uid FROM orders WHERE order_uid = $1`
 	rows, _ := db.Query(query, order.OrderUID)
 	defer rows.Close()
@@ -167,4 +167,29 @@ func generateRandomOrder() models.Order {
 	}
 
 	return order
+}
+
+func clearDB(t *testing.T) {
+	deleteQuery := `DELETE FROM orders`
+	_, err := db.Exec(deleteQuery)
+	if err != nil {
+		log.Fatal(err)
+	}
+	assert.NoError(t, err)
+}
+
+func setupDB(t *testing.T) {
+	var err error
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
+	db, err = sql.Open("postgres", connStr)
+	assert.NoError(t, err)
+	if err != nil {
+		log.Printf("Error setting up db: %v", err)
+	}
+	err = db.Ping()
+	assert.NoError(t, err)
+	if err != nil {
+		log.Printf("Error pinging during setting up db: %v", err)
+	}
 }

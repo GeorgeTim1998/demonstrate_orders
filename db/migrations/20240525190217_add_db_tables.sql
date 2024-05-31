@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "deliveries" (
     "address" VARCHAR(255),
     "region" VARCHAR(255),
     "email" VARCHAR(255),
-    FOREIGN KEY ("order_uid") REFERENCES "orders" ("order_uid")
+    FOREIGN KEY ("order_uid") REFERENCES "orders" ("order_uid") ON DELETE CASCADE
 );
 
 -- Миграция для создания таблицы "payments"
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS "payments" (
     "delivery_cost" INTEGER,
     "goods_total" INTEGER,
     "custom_fee" INTEGER,
-    FOREIGN KEY ("order_uid") REFERENCES "orders" ("order_uid")
+    FOREIGN KEY ("order_uid") REFERENCES "orders" ("order_uid") ON DELETE CASCADE
 );
 
 -- Миграция для создания таблицы "items"
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS "items" (
     "nm_id" INTEGER,
     "brand" VARCHAR(255),
     "status" INTEGER,
-    FOREIGN KEY ("order_uid") REFERENCES "orders" ("order_uid")
+    FOREIGN KEY ("order_uid") REFERENCES "orders" ("order_uid") ON DELETE CASCADE
 );
 
 -- +goose StatementEnd
