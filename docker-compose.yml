@@ -46,6 +46,7 @@ services:
     command: >
       sh -c "/wait &&
       ./bin/goose -dir db/migrations postgres postgres://postgres:password@db:5432/demonstrate_orders_test?sslmode=disable up &&
+      ./main
       go test ./tests
       "
     ports:
