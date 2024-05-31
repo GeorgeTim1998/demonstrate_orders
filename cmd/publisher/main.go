@@ -19,7 +19,7 @@ func main() {
 		log.Fatalf("Error downloading .env: %v", err)
 	}
 
-	sc, err := stan.Connect("test-cluster", "publisher-client", stan.NatsURL(os.Getenv("NATS_HOST")))
+	sc, err := stan.Connect("test-cluster", "publisher-client", stan.NatsURL(os.Getenv("NATS_URL")))
 	if err != nil {
 		log.Fatal(err)
 	}
