@@ -19,7 +19,7 @@ type Config struct {
 func LoadConfig() (*Config, error) {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Ошибка загрузки файла .env: %v", err)
+		log.Fatalf("Error downloading .env: %v", err)
 	}
 
 	dbHost := os.Getenv("DB_HOST")

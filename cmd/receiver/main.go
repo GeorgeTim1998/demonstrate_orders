@@ -14,15 +14,21 @@ import (
 	"demonstrate_orders/db/models"
 
 	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 
 	"github.com/nats-io/stan.go"
 )
 
 func Run() error {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error downloading .env: %v", err)
+	}
+
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
-	sc, err := stan.Connect("test-cluster", "receiver-123", stan.NatsURL("nats://localhost:4223"))
+	sc, err := stan.Connect("test-cluster", "receiver-123", stan.NatsURL(os.Getenv("NATS_HOST")))
 	if err != nil {
 		log.Fatal(err)
 		return err

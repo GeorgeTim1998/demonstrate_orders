@@ -6,13 +6,20 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/nats-io/stan.go"
 )
 
 func main() {
-	sc, err := stan.Connect("test-cluster", "publisher-client", stan.NatsURL("nats://localhost:4223"))
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error downloading .env: %v", err)
+	}
+
+	sc, err := stan.Connect("test-cluster", "publisher-client", stan.NatsURL(os.Getenv("NATS_HOST")))
 	if err != nil {
 		log.Fatal(err)
 	}
